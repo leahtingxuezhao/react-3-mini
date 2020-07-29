@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
-import logo from './mainStreetAuto.svg';
-import axios from 'axios';
-import './App.css';
+import React, { Component } from "react";
+import logo from "./mainStreetAuto.svg";
+import axios from "axios";
+import "./App.css";
 
 // Toast notification dependencies
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast } from "react-toastify";
 
 class App extends Component {
   constructor(props) {
@@ -12,115 +12,152 @@ class App extends Component {
 
     this.state = {
       vehiclesToDisplay: [],
-      buyersToDisplay: []
+      buyersToDisplay: [],
     };
-
-    this.getVehicles = this.getVehicles.bind(this);
-    this.getPotentialBuyers = this.getPotentialBuyers.bind(this);
-    this.sellCar = this.sellCar.bind(this);
-    this.addCar = this.addCar.bind(this);
-    this.filterByColor = this.filterByColor.bind(this);
-    this.filterByMake = this.filterByMake.bind(this);
-    this.addBuyer = this.addBuyer.bind(this);
-    this.nameSearch = this.nameSearch.bind(this);
-    this.resetData = this.resetData.bind(this);
-    this.byYear = this.byYear.bind(this);
-    this.deleteBuyer = this.deleteBuyer.bind(this);
   }
 
-  getVehicles() {
+  getVehicles = () => {
+    axios
+      .get("https://joes-autos.herokuapp.com/api/vehicles")
+      .then((response) => {
+        this.setState({
+          vehiclesToDisplay: response.data,
+        });
+        toast.success("Successfully got Vehicles.");
+      })
+      .catch(() => toast.error("Failed at fetching Vehicles"));
     // axios (GET)
     // setState with response -> vehiclesToDisplay
-  }
+  };
 
-  getPotentialBuyers() {
-    // axios (GET)
-    // setState with response -> buyersToDisplay
-  }
-
-  sellCar(id) {
-    // axios (DELETE)
-    // setState with response -> vehiclesToDisplay
-  }
-
-  filterByMake() {
-    let make = this.selectedMake.value;
-
-    // axios (GET)
-    // setState with response -> vehiclesToDisplay
-  }
-
-  filterByColor() {
-    let color = this.selectedColor.value;
-
-    // axios (GET)
-    // setState with response -> vehiclesToDisplay
-  }
-
-  updatePrice(priceChange, id) {
+  updatePrice = (priceChange, id) => {
+    axios
+      .put(`https://joes-autos.herokuapp.com/api/vehicles/${id}/${priceChange}`)
+      .then((response) => {
+        console.log(response.data);
+        this.setState({
+          vehiclesToDisplay: response.data.vehicles,
+        });
+        toast.success("Successfully update price.");
+      })
+      .catch(() => toast.error("Failed at updating price"));
     // axios (PUT)
     // setState with response -> vehiclesToDisplay
-  }
+  };
 
-  addCar() {
+  getPotentialBuyers = () => {
+    axios
+      .get("https://joes-autos.herokuapp.com/api/buyers")
+      .then((response) => {
+        this.setState({
+          buyersToDisplay: response.data,
+        });
+        toast.success("Successfully got Buyers.");
+      })
+      .catch(() => toast.error("Failed at fetching Buyers"));
+    // axios (GET)
+    // setState with response -> buyersToDisplay
+  };
+
+  addCar = () => {
     let newCar = {
       make: this.make.value,
       model: this.model.value,
       color: this.color.value,
       year: this.year.value,
-      price: this.price.value
+      price: this.price.value,
     };
-
+    axios
+      .post("https://joes-autos.herokuapp.com/api/vehicles", newCar)
+      .then((response) => {
+        console.log(response.data);
+        this.setState({
+          vehiclesToDisplay: response.data.vehicles,
+        });
+        toast.success("Successfully add a new car.");
+      })
+      .catch(() => toast.error("Failed at adding new car"));
     // axios (POST)
     // setState with response -> vehiclesToDisplay
-  }
+  };
 
-  addBuyer() {
+  sellCar = (id) => {
+    axios
+      .delete(`https://joes-autos.herokuapp.com/api/vehicles/${id}`)
+      .then((response) => {
+        {
+          this.setState({
+            vehiclesToDisplay: response.data.vehicles,
+          });
+          toast.success("Successfully deleted a car.");
+        }
+      })
+      .catch(() => toast.error("Failed at deleting"));
+    // axios (DELETE)
+    // setState with response -> vehiclesToDisplay
+  };
+
+  filterByMake = () => {
+    let make = this.selectedMake.value;
+
+    // axios (GET)
+    // setState with response -> vehiclesToDisplay
+  };
+
+  filterByColor = () => {
+    let color = this.selectedColor.value;
+
+    // axios (GET)
+    // setState with response -> vehiclesToDisplay
+  };
+
+  addBuyer = () => {
     let newBuyer = {
       name: this.name.value,
       phone: this.phone.value,
-      address: this.address.value
+      address: this.address.value,
     };
 
     //axios (POST)
     // setState with response -> buyersToDisplay
-  }
+  };
 
-  deleteBuyer(id) {
+  deleteBuyer = (id) => {
     // axios (DELETE)
     //setState with response -> buyersToDisplay
-  }
+  };
 
-  nameSearch() {
+  nameSearch = () => {
     let searchLetters = this.searchLetters.value;
 
     // axios (GET)
     // setState with response -> buyersToDisplay
-  }
+  };
 
-  byYear() {
+  byYear = () => {
     let year = this.searchYear.value;
 
     // axios (GET)
     // setState with response -> vehiclesToDisplay
-  }
+  };
 
   // Do not edit the code below
-  resetData(dataToReset) {
+  resetData = (dataToReset) => {
     axios
-      .get('https://joes-autos.herokuapp.com/api/' + dataToReset + '/reset')
-      .then(res => {
-        if (dataToReset === 'vehicles') {
+      .get("https://joes-autos.herokuapp.com/api/" + dataToReset + "/reset")
+      .then((res) => {
+        if (dataToReset === "vehicles") {
           this.setState({ vehiclesToDisplay: res.data.vehicles });
         } else {
           this.setState({ buyersToDisplay: res.data.buyers });
         }
       });
-  }
+  };
   // Do not edit the code above
 
   render() {
-    const vehicles = this.state.vehiclesToDisplay.map(v => {
+    console.log(this.state.vehiclesToDisplay);
+    const vehicles = this.state.vehiclesToDisplay.map((v) => {
       return (
         <div key={v.id}>
           <p>Make: {v.make}</p>
@@ -131,14 +168,14 @@ class App extends Component {
 
           <button
             className="btn btn-sp"
-            onClick={() => this.updatePrice('up', v.id)}
+            onClick={() => this.updatePrice("up", v.id)}
           >
             Increase Price
           </button>
 
           <button
             className="btn btn-sp"
-            onClick={() => this.updatePrice('down', v.id)}
+            onClick={() => this.updatePrice("down", v.id)}
           >
             Decrease Price
           </button>
@@ -152,7 +189,7 @@ class App extends Component {
       );
     });
 
-    const buyers = this.state.buyersToDisplay.map(person => {
+    const buyers = this.state.buyersToDisplay.map((person) => {
       return (
         <div key={person.id}>
           <p>Name: {person.name}</p>
@@ -182,14 +219,14 @@ class App extends Component {
 
           <button
             className="header-btn1 btn"
-            onClick={() => this.resetData('vehicles')}
+            onClick={() => this.resetData("vehicles")}
           >
             Reset Vehicles
           </button>
 
           <button
             className="header-btn2 btn"
-            onClick={() => this.resetData('buyers')}
+            onClick={() => this.resetData("buyers")}
           >
             Reset Buyers
           </button>
@@ -202,7 +239,7 @@ class App extends Component {
 
           <select
             onChange={this.filterByMake}
-            ref={selectedMake => {
+            ref={(selectedMake) => {
               this.selectedMake = selectedMake;
             }}
             className="btn-sp"
@@ -223,7 +260,7 @@ class App extends Component {
           </select>
 
           <select
-            ref={selectedColor => {
+            ref={(selectedColor) => {
               this.selectedColor = selectedColor;
             }}
             onChange={this.filterByColor}
@@ -245,13 +282,13 @@ class App extends Component {
             onChange={this.nameSearch}
             placeholder="Search by name"
             type="text"
-            ref={searchLetters => {
+            ref={(searchLetters) => {
               this.searchLetters = searchLetters;
             }}
           />
 
           <input
-            ref={searchYear => {
+            ref={(searchYear) => {
               this.searchYear = searchYear;
             }}
             className="btn-sp"
@@ -274,14 +311,14 @@ class App extends Component {
           <input
             className="btn-sp"
             placeholder="make"
-            ref={make => {
+            ref={(make) => {
               this.make = make;
             }}
           />
           <input
             className="btn-sp"
             placeholder="model"
-            ref={model => {
+            ref={(model) => {
               this.model = model;
             }}
           />
@@ -289,14 +326,14 @@ class App extends Component {
             type="number"
             className="btn-sp"
             placeholder="year"
-            ref={year => {
+            ref={(year) => {
               this.year = year;
             }}
           />
           <input
             className="btn-sp"
             placeholder="color"
-            ref={color => {
+            ref={(color) => {
               this.color = color;
             }}
           />
@@ -304,7 +341,7 @@ class App extends Component {
             type="number"
             className="btn-sp"
             placeholder="price"
-            ref={price => {
+            ref={(price) => {
               this.price = price;
             }}
           />
@@ -318,21 +355,21 @@ class App extends Component {
           <input
             className="btn-sp"
             placeholder="name"
-            ref={name => {
+            ref={(name) => {
               this.name = name;
             }}
           />
           <input
             className="btn-sp"
             placeholder="phone"
-            ref={phone => {
+            ref={(phone) => {
               this.phone = phone;
             }}
           />
           <input
             className="btn-sp"
             placeholder="address"
-            ref={address => {
+            ref={(address) => {
               this.address = address;
             }}
           />
